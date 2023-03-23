@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { GoogleAuthProvider, getAuth, signInWithPopup, type UserCredential } from 'firebase/auth';
 	import authStore from '$lib/authStore';
+	import { browser } from '$app/environment';
 
 	export let user: UserCredential['user'] | null | undefined;
 
@@ -11,6 +12,11 @@
 		authStore.set(result.user);
 	};
 
+	const logout = () => {
+		browser ? window.localStorage.removeItem('userData') : '';
+		authStore.set(null);
+	};
+
 	authStore.subscribe(async (resp) => {
 		user = resp;
 	});
@@ -19,6 +25,7 @@
 {#if user}
 	<img src={user.photoURL} alt="profile" />
 	Welcome, {user.displayName}
+	<button on:click={logout}>Logout</button>
 {:else}
 	<button on:click={click}>Login</button>
 {/if}
